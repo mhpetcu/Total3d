@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calculator Preț Print 3D</title>
+<style>
+:root {
+  --bg: #0f1115;
+  --card: #171a21;
+  --text: #e6e6e6;
+  --muted: #9aa0a6;
+  --accent: #4ade80;
+}
+* { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont; }
+body { margin: 0; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; }
+.container { max-width: 540px; width: 100%; }
+h1 { font-size: 22px; margin-bottom: 4px; }
+.subtitle { color: var(--muted); margin-bottom: 16px; }
+.card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px; }
+input, button { width: 100%; padding: 10px 12px; border-radius: 10px; border: none; background: #0c0e13; color: var(--text); margin-bottom: 10px; }
+button { cursor: pointer; background: #111827; }
+button.accent { background: var(--accent); color: #04130a; font-weight: 600; }
+.row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; }
+.result { font-size: 18px; font-weight: 600; color: var(--accent); }
+.hidden { display: none; }
+.item { display: grid; grid-template-columns: 2fr 1fr auto; gap: 6px; margin-bottom: 6px; }
+.footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 10px; }
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>Calculator Preț Print 3D</h1>
+  <div class="subtitle">STAS · Bambu P2S default</div>
+
+  <div class="card">
+    <label>Durată printare</label>
+    <div class="item">
+      <input id="h" type="number" min="0" placeholder="ore">
+      <input id="m" type="number" min="0" max="59" placeholder="minute">
+      <span></span>
+    </div>
+
+    <label>Filament (grame)</label>
+    <input id="grams" type="number" value="40">
+
+    <label>Cost filament (lei / kg)</label>
+    <input id="filamentCost" type="number" value="80">
+  </div>
+
+  <div class="card">
+    <button onclick="toggleAdvanced()">⚙️ Curent & mentenanță</button>
+    <div id="advanced" class="hidden">
+      <label>Consum electric (lei / oră)</label>
+      <input id="powerCost" type="number" step="0.1" value="1.2">
+
+      <label>Preț imprimantă (Bambu P2S)</label>
+      <input id="printerPrice" type="number" value="4500">
+
+      <label>Durată viață estimată (ore)</label>
+      <input id="printerHours" type="number" value="2000">
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Manoperă (lei)</label>
+    <input id="labor" type="number" value="10">
+
+    <label>Alte costuri (piese)</label>
+    <div id="parts"></div>
+    <button onclick="addPart()">+ Adaugă piesă</button>
+  </div>
+
+  <div class="card">
+    <div class="row"><span>Filament</span><span id="rMaterial">0</span></div>
+    <div class="row"><span>Curent</span><span id="rPower">0</span></div>
+    <div class="row"><span>Mentenanță</span><span id="rMaintenance">0</span></div>
+    <div class="row"><span>Manoperă</span><span id="rLabor">0</span></div>
+    <div class="row"><span>Piese</span><span id="rExtras">0</span></div>
+    <hr style="border-color:#222">
+    <div class="row result"><span>Total</span><span id="rTotal">0</span></div>
+  </div>
+
+  <button class="accent" onclick="exportText()">🧾 Export pentru client</button>
+
+  <div class="footer">by @mhpetcu · print friendly</div>
+</div>
+
+<script>
+function toggleAdvanced(){
+  document.getElementById('advanced').classList.toggle('hidden');
+}
+
+function addPart(){
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <input placeholder="ex: 3x șurub M3">
+    <input type="number" placeholder="lei">
+    <button onclick="this.parentNode.remove(); calc()">✕</button>
+  `;
+  document.getElementById('parts').appendChild(div);
+}
+
+function calc(){
+  const h = +document.getElementById('h').value || 0;
+  const m = +document.getElementById('m').value || 0;
+  const hours = h + m / 60;
+
+  const gramsVal = +document.getElementById('grams').value || 0;
+  const filamentKg = +document.getElementById('filamentCost').value || 0;
+  const power = +document.getElementById('powerCost').value || 0;
+  const printerPriceVal = +document.getElementById('printerPrice').value || 0;
+  const printerHoursVal = +document.getElementById('printerHours').value || 1;
+  const laborVal = +document.getElementById('labor').value || 0;
+
+  let extras = 0;
+  document.querySelectorAll('#parts input[type=number]')
+    .forEach(i => extras += (+i.value || 0));
+
+  const material = gramsVal * (filamentKg / 1000);
+  const powerCostVal = hours * power;
+  const maintenance = hours * (printerPriceVal / printerHoursVal);
+  const total = material + powerCostVal + maintenance + laborVal + extras;
+
+  rMaterial.textContent = `${material.toFixed(2)} lei (${gramsVal} g)`;
+  rPower.textContent = powerCostVal.toFixed(2) + ' lei';
+  rMaintenance.textContent = maintenance.toFixed(2) + ' lei';
+  rLabor.textContent = laborVal.toFixed(2) + ' lei';
+  rExtras.textContent = extras.toFixed(2) + ' lei';
+  rTotal.textContent = total.toFixed(2) + ' lei';
+}
+
+function exportText(){
+  calc();
+  const h = +document.getElementById('h').value || 0;
+  const m = +document.getElementById('m').value || 0;
+  const duration = `${h}h ${m}m`;
+
+  let partsText = '';
+  let partsSubtotal = 0;
+  document.querySelectorAll('#parts .item').forEach(item => {
+    const name = item.querySelector('input[type=text], input:not([type=number])').value || 'Piesă';
+    const price = +item.querySelector('input[type=number]').value || 0;
+    partsSubtotal += price;
+    partsText += `- ${name}: ${price.toFixed(2)} lei\n`;
+  });
+
+  const otherCosts = (
+    parseFloat(rPower.textContent) +
+    parseFloat(rMaintenance.textContent)
+  ).toFixed(2);
+
+  const text =
+`OFERTĂ PRINT 3D
+----------------
+Durată print: ${duration}
+Filament: ${rMaterial.textContent}
+Alte costuri: ${otherCosts} lei
+Manoperă: ${rLabor.textContent}
+
+Piese:
+${partsText || '-'}
+Subtotal piese: ${partsSubtotal.toFixed(2)} lei
+----------------
+Total print: ${rTotal.textContent}`;
+
+  navigator.clipboard.writeText(text);
+  alert('Export copiat – gata de print termic');
+}
+
+['h','m','grams','filamentCost','powerCost','printerPrice','printerHours','labor']
+  .forEach(id => document.getElementById(id).addEventListener('input', calc));
+
+calc();
+</script>
+</body>
+</html>
