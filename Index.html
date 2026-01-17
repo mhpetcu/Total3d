@@ -146,7 +146,7 @@ function exportText(){
     parseFloat(rPower.textContent) + parseFloat(rMaintenance.textContent)
   ).toFixed(2);
 
-  const text = `OFERTĂ PRINT 3D\n----------------\nDurată print: ${duration}\nFilament: ${rMaterial.textContent}\nAlte costuri: ${otherCosts} lei\nManoperă: ${rLabor.textContent}\n\nPiese:\n${partsText || '-'}Subtotal piese: ${partsSubtotal.toFixed(2)} lei\n----------------\nTotal print: ${rTotal.textContent}`;
+  const text = `OFERTĂ PRINT 3D\n----------------\nDurată print: ${duration}\nFilament: ${rMaterial.textContent}\nAlte costuri: ${otherCosts} lei\nManoperă: ${rLabor.textContent}\n\nPiese:\n${partsText || '-'}\nSubtotal piese: ${partsSubtotal.toFixed(2)} lei\n----------------\nTotal print: ${rTotal.textContent}`;
 
   navigator.clipboard.writeText(text);
   alert('Export copiat – gata de print termic');
