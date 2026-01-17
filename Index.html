@@ -29,7 +29,6 @@ button.accent { background: var(--accent); color: #04130a; font-weight: 600; }
 .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 10px; }
 </style>
 </head>
-
 <body>
 <div class="container">
   <h1>Calculator Preț Print 3D</h1>
@@ -94,20 +93,16 @@ function toggleAdvanced(){
 }
 
 function addPart(){
-  const div = document.createElement('div');
-  div.className = 'item';
-  div.innerHTML = `
-    <input placeholder="ex: 3x șurub M3">
-    <input type="number" placeholder="lei">
-    <button onclick="this.parentNode.remove(); calc()">✕</button>
-  `;
+  const div=document.createElement('div');
+  div.className='item';
+  div.innerHTML=`<input placeholder="ex: 3x șurub M3"><input type="number" placeholder="lei"><button onclick="this.parentNode.remove();calc()">✕</button>`;
   document.getElementById('parts').appendChild(div);
 }
 
 function calc(){
   const h = +document.getElementById('h').value || 0;
   const m = +document.getElementById('m').value || 0;
-  const hours = h + m / 60;
+  const hours = h + m/60;
 
   const gramsVal = +document.getElementById('grams').value || 0;
   const filamentKg = +document.getElementById('filamentCost').value || 0;
@@ -117,8 +112,7 @@ function calc(){
   const laborVal = +document.getElementById('labor').value || 0;
 
   let extras = 0;
-  document.querySelectorAll('#parts input[type=number]')
-    .forEach(i => extras += (+i.value || 0));
+  document.querySelectorAll('#parts input[type=number]').forEach(i=>extras += (+i.value || 0));
 
   const material = gramsVal * (filamentKg / 1000);
   const powerCostVal = hours * power;
@@ -141,7 +135,7 @@ function exportText(){
 
   let partsText = '';
   let partsSubtotal = 0;
-  document.querySelectorAll('#parts .item').forEach(item => {
+  document.querySelectorAll('#parts .item').forEach(item=>{
     const name = item.querySelector('input[type=text], input:not([type=number])').value || 'Piesă';
     const price = +item.querySelector('input[type=number]').value || 0;
     partsSubtotal += price;
@@ -149,30 +143,17 @@ function exportText(){
   });
 
   const otherCosts = (
-    parseFloat(rPower.textContent) +
-    parseFloat(rMaintenance.textContent)
+    parseFloat(rPower.textContent) + parseFloat(rMaintenance.textContent)
   ).toFixed(2);
 
-  const text =
-`OFERTĂ PRINT 3D
-----------------
-Durată print: ${duration}
-Filament: ${rMaterial.textContent}
-Alte costuri: ${otherCosts} lei
-Manoperă: ${rLabor.textContent}
-
-Piese:
-${partsText || '-'}
-Subtotal piese: ${partsSubtotal.toFixed(2)} lei
-----------------
-Total print: ${rTotal.textContent}`;
+  const text = `OFERTĂ PRINT 3D\n----------------\nDurată print: ${duration}\nFilament: ${rMaterial.textContent}\nAlte costuri: ${otherCosts} lei\nManoperă: ${rLabor.textContent}\n\nPiese:\n${partsText || '-'}Subtotal piese: ${partsSubtotal.toFixed(2)} lei\n----------------\nTotal print: ${rTotal.textContent}`;
 
   navigator.clipboard.writeText(text);
   alert('Export copiat – gata de print termic');
 }
 
 ['h','m','grams','filamentCost','powerCost','printerPrice','printerHours','labor']
-  .forEach(id => document.getElementById(id).addEventListener('input', calc));
+.forEach(id=>document.getElementById(id).addEventListener('input', calc));
 
 calc();
 </script>
